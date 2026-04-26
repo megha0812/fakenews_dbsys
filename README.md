@@ -1,6 +1,6 @@
-# News Verification System
+# fakenews_dbsys
 
-A full-stack DBMS-based Flask web application connected to the existing MySQL `fakenewsdb` schema without modifying table structure.
+A DBMS-based news verification system developed using MySQL, showcasing normalization-friendly design, transaction control, and concurrency handling. This version includes a full-stack Flask web interface connected to the existing `fakenewsdb` schema without modifying table structure.
 
 ## Stack
 
