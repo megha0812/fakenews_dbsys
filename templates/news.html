@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}View News | News Verification System{% endblock %}
+{% block header %}News Repository{% endblock %}
+
+{% block content %}
+<section class="panel glass">
+    <div class="panel-heading">
+        <div>
+            <p class="eyebrow">Search & Filter</p>
+            <h3>Browse News Records</h3>
+        </div>
+    </div>
+    <form class="filter-grid" method="get" action="{{ url_for('news') }}">
+        <label>
+            <span>Category</span>
+            <select name="category_id">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.category_id }}" {{ 'selected' if filters.category_id == category.category_id|string else '' }}>
+                    {{ category.category_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            <span>Status</span>
+            <select name="status">
+                <option value="">All Statuses</option>
+                {% for option in ['Real', 'Fake', 'Unverified'] %}
+                <option value="{{ option }}" {{ 'selected' if filters.status == option else '' }}>{{ option }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            <span>Verifier</span>
+            <select name="verifier_id">
+                <option value="">All Verifiers</option>
+                {% for verifier in verifiers %}
+                <option value="{{ verifier.verifier_id }}" {{ 'selected' if filters.verifier_id == verifier.verifier_id|string else '' }}>
+                    {{ verifier.verifier_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
+            <a class="btn btn-ghost" href="{{ url_for('news') }}">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="news-grid">
+    {% for item in items %}
+    <article class="news-card glass">
+        <div class="news-card-top">
+            <span class="chip">{{ item.category_name or 'General' }}</span>
+            <span class="status-badge {{ item.verification_status|lower }}">{{ item.verification_status }}</span>
+        </div>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.content or 'No content preview available.' }}</p>
+        <div class="news-meta">
+            <span><i class="fa-solid fa-tower-broadcast"></i> {{ item.source_name or 'Unknown Source' }}</span>
+            <span><i class="fa-solid fa-calendar-days"></i> {{ item.publish_date }}</span>
+            <span><i class="fa-solid fa-user-check"></i> {{ item.verifier_name or 'Pending review' }}</span>
+        </div>
+        <div class="news-footer">
+            <div>
+                <small>Credibility Score</small>
+                <strong>{{ item.credibility_score or 'N/A' }}/10</strong>
+            </div>
+            <div>
+                <small>Confidence</small>
+                <strong>{{ item.confidence_level if item.confidence_level is not none else 'N/A' }}</strong>
+            </div>
+        </div>
+    </article>
+    {% else %}
+    <article class="panel glass empty-state">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <h3>No news records matched your filter.</h3>
+        <p>Try resetting the filters to see the full dataset.</p>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

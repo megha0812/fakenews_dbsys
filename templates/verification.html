@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Verification | News Verification System{% endblock %}
+{% block header %}Verification Module{% endblock %}
+
+{% block content %}
+<section class="verification-layout">
+    <article class="panel glass">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">INSERT Query</p>
+                <h3>Add New Verification</h3>
+            </div>
+        </div>
+        <form class="form-grid" method="post" action="{{ url_for('add_verification') }}">
+            <label>
+                <span>News Record</span>
+                <select name="news_id" required>
+                    {% for item in news_items %}
+                    <option value="{{ item.news_id }}">{{ item.news_id }} - {{ item.title }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Verifier</span>
+                <select name="verifier_id" required>
+                    {% for verifier in verifiers %}
+                    <option value="{{ verifier.verifier_id }}">{{ verifier.verifier_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Status</span>
+                <select name="status" required>
+                    <option value="Real">Real</option>
+                    <option value="Fake">Fake</option>
+                </select>
+            </label>
+            <label>
+                <span>Confidence Level</span>
+                <input type="number" name="confidence_level" min="0" max="10" required>
+            </label>
+            <label class="full-width">
+                <span>Remarks</span>
+                <textarea name="remarks" rows="3" placeholder="Verification notes"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-plus"></i> Add Verification</button>
+        </form>
+    </article>
+
+    <article class="panel glass">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">UPDATE Query</p>
+                <h3>Update Existing Status</h3>
+            </div>
+        </div>
+        <form class="form-grid" method="post" action="{{ url_for('update_verification') }}">
+            <label>
+                <span>Verification Record</span>
+                <select name="verification_id" required>
+                    {% for item in verifications %}
+                    <option value="{{ item.verification_id }}">#{{ item.verification_id }} - {{ item.title }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Status</span>
+                <select name="status" required>
+                    <option value="Real">Real</option>
+                    <option value="Fake">Fake</option>
+                </select>
+            </label>
+            <label>
+                <span>Confidence Level</span>
+                <input type="number" name="confidence_level" min="0" max="10" required>
+            </label>
+            <label class="full-width">
+                <span>Remarks</span>
+                <textarea name="remarks" rows="3" placeholder="Updated review notes"></textarea>
+            </label>
+            <button class="btn btn-secondary" type="submit"><i class="fa-solid fa-pen"></i> Update Verification</button>
+        </form>
+    </article>
+</section>
+
+<section class="panel glass">
+    <div class="panel-heading">
+        <div>
+            <p class="eyebrow">Concurrency Demonstration</p>
+            <h3>Row-level Locking with <code>SELECT ... FOR UPDATE</code></h3>
+        </div>
+    </div>
+    <p class="panel-copy">Use one browser session to lock a row, then open a second session and test the same record. If the row is busy, the app returns: <strong>"Record locked by another user"</strong>.</p>
+    <div id="lock-feedback" class="inline-feedback" aria-live="polite"></div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Verification ID</th>
+                    <th>News</th>
+                    <th>Verifier</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in verifications %}
+                <tr>
+                    <td>#{{ item.verification_id }}</td>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.verifier_name }}</td>
+                    <td><span class="status-badge {{ item.status|lower }}">{{ item.status }}</span></td>
+                    <td class="table-actions">
+                        <button class="btn btn-small btn-primary lock-action" data-news-id="{{ item.news_id }}" type="button">
+                            <i class="fa-solid fa-lock"></i> Lock
+                        </button>
+                        <button class="btn btn-small btn-ghost test-lock-action" data-news-id="{{ item.news_id }}" type="button">
+                            <i class="fa-solid fa-vial"></i> Test Lock
+                        </button>
+                        <button class="btn btn-small btn-secondary unlock-action" data-news-id="{{ item.news_id }}" type="button">
+                            <i class="fa-solid fa-unlock"></i> Release
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

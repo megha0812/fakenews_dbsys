@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | News Verification System{% endblock %}
+{% block header %}Verification Dashboard{% endblock %}
+
+{% block content %}
+<section class="hero-panel glass">
+    <div>
+        <p class="eyebrow">Main Highlight</p>
+        <h3>Track the credibility of incoming news with normalized MySQL data, live verification metrics, and transaction-safe workflows.</h3>
+    </div>
+    <div class="hero-pills">
+        <span><i class="fa-solid fa-lock"></i> Row-level locking</span>
+        <span><i class="fa-solid fa-arrows-rotate"></i> Transaction control</span>
+        <span><i class="fa-solid fa-chart-column"></i> Live analytics</span>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="metric-card glass">
+        <div class="metric-icon blue"><i class="fa-solid fa-newspaper"></i></div>
+        <div>
+            <p>Total News Count</p>
+            <h3 class="counter" data-target="{{ dashboard.total_news }}">0</h3>
+        </div>
+    </article>
+    <article class="metric-card glass">
+        <div class="metric-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div>
+            <p>Verified News</p>
+            <h3 class="counter" data-target="{{ dashboard.status_counts.real_count }}">0</h3>
+        </div>
+    </article>
+    <article class="metric-card glass">
+        <div class="metric-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+            <p>Fake News</p>
+            <h3 class="counter" data-target="{{ dashboard.status_counts.fake_count }}">0</h3>
+        </div>
+    </article>
+    <article class="metric-card glass">
+        <div class="metric-icon amber"><i class="fa-solid fa-user-shield"></i></div>
+        <div>
+            <p>Active Verifiers</p>
+            <h3 class="counter" data-target="{{ dashboard.counters.verifier_count }}">0</h3>
+        </div>
+    </article>
+</section>
+
+<section class="charts-grid">
+    <article class="panel glass">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Verified vs Fake</p>
+                <h3>Status Snapshot</h3>
+            </div>
+        </div>
+        <canvas
+            id="statusChart"
+            data-real="{{ dashboard.status_counts.real_count }}"
+            data-fake="{{ dashboard.status_counts.fake_count }}"
+            data-unverified="{{ dashboard.status_counts.unverified_count }}"
+        ></canvas>
+    </article>
+
+    <article class="panel glass">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Category-wise Distribution</p>
+                <h3>News Volume by Category</h3>
+            </div>
+        </div>
+        <canvas
+            id="categoryChart"
+            data-labels='{{ dashboard.category_distribution | map(attribute="category_name") | list | tojson }}'
+            data-values='{{ dashboard.category_distribution | map(attribute="total_news") | list | tojson }}'
+        ></canvas>
+    </article>
+</section>
+
+<section class="split-grid">
+    <article class="panel glass">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Recent Verifications</p>
+                <h3>Latest Review Activity</h3>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>News</th>
+                        <th>Category</th>
+                        <th>Verifier</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in dashboard.recent_verifications %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.category_name or 'Unassigned' }}</td>
+                        <td>{{ item.verifier_name }}</td>
+                        <td><span class="status-badge {{ item.status|lower }}">{{ item.status }}</span></td>
+                        <td>{{ item.verification_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <article class="panel glass">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">System Pulse</p>
+                <h3>Operational Insights</h3>
+            </div>
+        </div>
+        <div class="mini-stats">
+            <div class="mini-card">
+                <span>Total Verifications</span>
+                <strong class="counter" data-target="{{ dashboard.counters.total_verifications }}">0</strong>
+            </div>
+            <div class="mini-card">
+                <span>Average Confidence</span>
+                <strong class="counter" data-target="{{ dashboard.counters.avg_confidence or 0 }}">0</strong>
+            </div>
+            <div class="mini-card">
+                <span>Unverified Stories</span>
+                <strong class="counter" data-target="{{ dashboard.status_counts.unverified_count }}">0</strong>
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}
